@@ -39,7 +39,7 @@ If you're only importing movies, you can simplify the process:
 Before using this script, ensure you have the following:
 
 1.  **Python 3.x**: [Download Python](https://www.python.org/downloads/) if you don't already have it. (**Only required for TV Shows**)
-2.  **`requests` Library**: Install the `requests` library using pip:
+2.  **requests Library**: Install the `requests` library using pip:
     ```bash
     pip install requests
     ```
@@ -123,9 +123,6 @@ These steps are **only required if you are importing TV Shows.**
     python trakt_to_imdb.py
     ```
 
-3.  **Import the generated CSV into IMDb**:
-    -   Use the [IMDb List Importer Greasemonkey script](https://greasyfork.org/en/scripts/23584-imdb-list-importer) to import the generated CSV file into your IMDb account.
-
 ---
 
 ## Configuration (TV Shows Only)
@@ -135,7 +132,7 @@ The script uses the following variables, which you can customize.  These are **o
 -   `tmdb_api_key`: Your TMDb API key.
 -   `trakt_csv_file`: Path to your Trakt CSV export file.
 -   `imdb_csv_file`: Path to save the IMDb-compatible CSV file.
--   `tmdb_tv_id_column_name`: Column name in the CSV file containing TMDb TV Show IDs (default: `tmdb_id`).
+-   `tmdb_tv_id_column_name`: Column name in the CSV file containing TMDb TV Show IDs (default: `tmdb_id`). **If your TMDb ID column is named differently, change this variable in the script accordingly.**
 -   `title_column_name`: Column name in the CSV file containing titles (default: `title`).
 -   `year_column_name`: Column name in the CSV file containing release years (default: `year`).
 
