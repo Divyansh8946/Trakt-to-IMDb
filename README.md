@@ -102,7 +102,7 @@ These steps are **only required if you are importing TV Shows.**
     ```bash
     pip install requests
     ```
-3.  **Get a TMDb API Key**: Obtain your API key from the [TMDb Developer site](https://developer.themoviedb.org/reference/intro/getting-started) and replace the placeholder in the script:
+3.  **Get a TMDb API Key**: Obtain your API key from the [TMDb Developer site](https://developer.themoviedb.org/reference/intro/getting-started).  A typical API key looks like this: `8044261xxxxxxxxxxxxxxxxxx78c4b3`. Make sure to replace the example key with your own!
     ```python
     tmdb_api_key = "YOUR_TMDB_API_KEY_HERE"
     ```
