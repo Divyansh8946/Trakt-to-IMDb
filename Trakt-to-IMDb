@@ -1,0 +1,74 @@
+import csv
+import requests
+import time
+
+# TMDb API settings
+tmdb_api_key = "YOUR_TMDB_API_KEY_HERE" 
+tmdb_api_base_url = "https://api.themoviedb.org/3"
+tmdb_api_tv_external_ids_endpoint = "/tv/{tv_id}/external_ids" # Endpoint to get external IDs for TV shows
+
+# CSV file paths and column names
+trakt_csv_file = r"INPUT_CSV_FILE_PATH_HERE" # **RAW STRING - IMPORTANT!**
+imdb_csv_file = r"OUTPUT_CSV_FILE_PATH_HERE # **RAW STRING - IMPORTANT!**
+tmdb_tv_id_column_name = "TmdbId"
+title_column_name = "Title "
+year_column_name = "Year"
+
+
+def convert_tmdb_tv_id_to_imdb_csv_direct_tv(trakt_csv_file, imdb_csv_file, tmdb_tv_id_column_name, title_column_name, year_column_name, tmdb_api_key): # **Parameter name: trakt_csv_file (now consistent)**
+    """
+    Converts a CSV with TMDb TV Show IDs to an IMDb-compatible CSV using TMDb API's /tv/external_ids endpoint.
+    Direct lookup using TMDb TV Show IDs. (Fresh Script for TV Shows as requested)
+    """
+    with open(trakt_csv_file, 'r', encoding='utf-8') as infile, open(imdb_csv_file, 'w', newline='', encoding='utf-8') as outfile: # **Combined lines - No line continuation here**
+
+        reader = csv.DictReader(infile)
+        writer = csv.writer(outfile, quoting=csv.QUOTE_MINIMAL)
+
+        writer.writerow(["Const", "Description"])
+
+        for row in reader:
+            tmdb_tv_id = row.get(tmdb_tv_id_column_name)
+            title = row.get(title_column_name)
+            year = row.get(year_column_name)
+
+            imdb_id = None
+            description = ""
+
+            if tmdb_tv_id and tmdb_tv_id.isdigit():
+                # 1. Direct lookup using TMDb TV Show ID and /tv/external_ids endpoint
+                tmdb_external_ids_url = f"{tmdb_api_base_url}{tmdb_api_tv_external_ids_endpoint.format(tv_id=tmdb_tv_id)}?api_key={tmdb_api_key}"
+                try:
+                    response = requests.get(tmdb_external_ids_url)
+                    response.raise_for_status()
+                    data = response.json()
+                    imdb_id_from_tmdb = data.get('imdb_id')
+
+                    if imdb_id_from_tmdb and imdb_id_from_tmdb.startswith('tt'):
+                        imdb_id = imdb_id_from_tmdb
+                        if title:
+                            description = f"{title} (TV Show)"
+                            if year:
+                                description += f" ({year})"
+                    else:
+                        warning_message = f"Warning: No valid IMDb ID found from /tv/external_ids endpoint for TMDb TV ID '{tmdb_tv_id}' (Title: {title}). TMDb response might be missing imdb_id or invalid format."
+                        print(warning_message)
+
+                except requests.exceptions.RequestException as e:
+                    error_message = f"Error fetching external IDs from TMDb API (endpoint: {tmdb_api_tv_external_ids_endpoint}) for TMDb TV ID '{tmdb_tv_id}' (Title: {title}): {e}"
+                    print(error_message)
+
+                if imdb_id:
+                    writer.writerow([imdb_id, description])
+                else:
+                    warning_message = f"Warning: Skipping row due to missing IMDb ID after direct lookup for TMDb TV ID: '{tmdb_tv_id}', Title: '{title}'"
+                    print(warning_message)
+            else:
+                warning_message = f"Warning: Skipping row due to invalid or missing TMDb TV ID in column '{tmdb_tv_id_column_name}': {row}"
+                print(warning_message)
+
+        print(f"Successfully converted '{trakt_csv_file}' to '{imdb_csv_file}' using TMDb API (Direct TV Show ID Lookup - No Line Continuation)") # Using variable name: imdb_csv_file
+
+
+if __name__ == "__main__":
+    convert_tmdb_tv_id_to_imdb_csv_direct_tv(trakt_csv_file, imdb_csv_file, tmdb_tv_id_column_name, title_column_name, year_column_name, tmdb_api_key) # Function call is already correct
